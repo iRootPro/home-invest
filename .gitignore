@@ -1,5 +1,5 @@
 bin/
-banki
+/banki
 banki.db
 banki.db-shm
 banki.db-wal
