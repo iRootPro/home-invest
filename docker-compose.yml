@@ -3,6 +3,8 @@ services:
     image: banki:latest
     container_name: banki
     restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
     ports:
       - "8080:8080"
     environment:

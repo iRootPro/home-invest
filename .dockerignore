@@ -6,3 +6,5 @@ bin/
 uploads/
 static/css/app.css
 *.tar
+deploy.conf
+deploy.sh

@@ -6,4 +6,5 @@ banki.db-wal
 static/css/app.css
 uploads/
 .env
+deploy.conf
 *.tar

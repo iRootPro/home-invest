@@ -28,22 +28,8 @@ seed:
 clean:
 	rm -f banki banki.db
 
-DEPLOY_HOST = 192.168.1.165
-DEPLOY_USER = root
-IMAGE_NAME = banki
-
-REPO_URL = git@github.com:iRootPro/home-invest.git
-
 deploy:
-	ssh $(DEPLOY_USER)@$(DEPLOY_HOST) "\
-		if [ ! -d ~/banki/src/.git ]; then \
-			git clone $(REPO_URL) ~/banki/src; \
-		else \
-			cd ~/banki/src && git pull; \
-		fi && \
-		cd ~/banki/src && docker build -t $(IMAGE_NAME):latest . && \
-		cp docker-compose.yml ~/banki/docker-compose.yml && \
-		cd ~/banki && docker compose up -d"
+	./deploy.sh
 
 deploy-logs:
-	ssh $(DEPLOY_USER)@$(DEPLOY_HOST) "cd ~/banki && docker compose logs -f --tail=100"
+	@source deploy.conf && ssh -p $${DEPLOY_PORT:-22} $${DEPLOY_USER}@$${DEPLOY_HOST} "cd $${DEPLOY_PATH} && docker compose logs -f --tail=100"
