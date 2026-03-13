@@ -13,6 +13,11 @@
         {{if .TotalExpectedProfit}}
         <div class="mt-2 text-sm opacity-85">Ожидаемый доход ≈ {{formatAmount .TotalExpectedProfit}} ₽</div>
         {{end}}
+        <div class="flex justify-center gap-6 mt-3 text-sm opacity-85">
+            <span>{{.DepositCount}} вкладов</span>
+            <span>·</span>
+            <span>{{printf "%.1f" .WeightedRate}}% средняя ставка</span>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -84,17 +89,54 @@
     </div>
     {{end}}
 
-    {{if .Wallets}}
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
-        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
-            <h3 class="text-sm font-semibold text-gray-900">Кошельки</h3>
-        </div>
-        <div class="p-4">
-            <div class="flex flex-wrap gap-2">
-                {{range .Wallets}}
-                <a href="/wallets/{{.ID}}" class="inline-block px-4 py-2 bg-gray-50 border border-gray-200 rounded-md text-blue-600 no-underline text-sm font-medium transition-colors hover:bg-blue-50 hover:border-blue-600">{{.Name}}</a>
-                {{end}}
+    {{if .BankStats}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 mb-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-3">По банкам</h3>
+        {{range .BankStats}}
+        <div class="mb-3 last:mb-0">
+            <div class="flex justify-between text-sm mb-1">
+                <span class="font-medium text-gray-700">{{.BankName}}</span>
+                <span class="tabular-nums text-gray-900 font-semibold">{{formatAmount .Total}} ₽</span>
             </div>
+            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full bg-blue-500" style="width: {{printf "%.0f" (pct .Total $.TotalAmount)}}%"></div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+    {{end}}
+
+    {{if or .ASVRed .ASVAmber .ASVGreen}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 mb-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-3">Лимиты АСВ</h3>
+        <div class="flex gap-4">
+            {{if .ASVGreen}}<div class="flex items-center gap-2">
+                <span class="h-3 w-3 rounded-full bg-green-500"></span>
+                <span class="text-sm text-gray-700">{{.ASVGreen}} в норме</span>
+            </div>{{end}}
+            {{if .ASVAmber}}<div class="flex items-center gap-2">
+                <span class="h-3 w-3 rounded-full bg-amber-500"></span>
+                <span class="text-sm text-amber-700 font-medium">{{.ASVAmber}} ≥80%</span>
+            </div>{{end}}
+            {{if .ASVRed}}<div class="flex items-center gap-2">
+                <span class="h-3 w-3 rounded-full bg-red-500"></span>
+                <span class="text-sm text-red-700 font-semibold">{{.ASVRed}} превышен</span>
+            </div>{{end}}
+        </div>
+    </div>
+    {{end}}
+
+    {{if .Wallets}}
+    <div class="mb-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-3">Кошельки</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {{range .Wallets}}
+            <a href="/wallets/{{.Wallet.ID}}" class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow no-underline">
+                <h4 class="text-lg font-semibold text-gray-900 mb-1">{{.Wallet.Name}}</h4>
+                <div class="text-xl font-bold tabular-nums text-gray-900">{{formatAmount .TotalAmount}} ₽</div>
+                <div class="text-xs text-gray-500 mt-1">{{len .Deposits}} вкладов</div>
+            </a>
+            {{end}}
         </div>
     </div>
     {{end}}
