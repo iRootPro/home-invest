@@ -50,47 +50,10 @@ func (h *DashboardHandler) Index(w http.ResponseWriter, r *http.Request) {
 		totalExpectedProfit += d.TotalProfit()
 	}
 
-	// Deposit count and weighted average rate
-	depositCount := len(activeDeposits)
-	var weightedRate float64
-	if totalAmount > 0 {
-		for _, d := range activeDeposits {
-			weightedRate += d.InterestRate * d.Amount
-		}
-		weightedRate /= totalAmount
-	}
-
-	// Bank stats
-	var bankStats []models.BankStat
-	if isAdmin {
-		bankStats, _ = models.StatsByBank(h.DB)
-	} else {
-		bankStats, _ = models.StatsByBankForMember(h.DB, memberID)
-	}
-
-	// ASV risk summary
 	asvOver := make(map[string]bool)
-	var asvRed, asvAmber, asvGreen int
 	for _, e := range asvEntries {
 		if e.Total > models.ASVLimit {
 			asvOver[fmt.Sprintf("%d_%d", e.HolderID, e.BankID)] = true
-		}
-		switch e.Color {
-		case "red":
-			asvRed++
-		case "orange":
-			asvAmber++
-		default:
-			asvGreen++
-		}
-	}
-
-	// Wallet summaries
-	var walletSummaries []*models.WalletSummary
-	for _, w := range wallets {
-		s, _ := models.GetWalletSummary(h.DB, w.ID)
-		if s != nil {
-			walletSummaries = append(walletSummaries, s)
 		}
 	}
 
@@ -99,17 +62,11 @@ func (h *DashboardHandler) Index(w http.ResponseWriter, r *http.Request) {
 		"IsAdmin":             isAdmin,
 		"TotalAmount":         totalAmount,
 		"TotalExpectedProfit": totalExpectedProfit,
-		"DepositCount":        depositCount,
-		"WeightedRate":        weightedRate,
 		"RoleTotals":          roleTotals,
 		"MemberStats":         memberStats,
-		"BankStats":           bankStats,
 		"ASVOver":             asvOver,
-		"ASVRed":              asvRed,
-		"ASVAmber":            asvAmber,
-		"ASVGreen":            asvGreen,
 		"Expiring":            expiring,
-		"Wallets":             walletSummaries,
+		"Wallets":             wallets,
 	}
 	templateutil.Render(w, "dashboard.html", data)
 }
