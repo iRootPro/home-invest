@@ -33,36 +33,6 @@
     }
 }
 
-/* ===== Responsive tables ===== */
-@layer components {
-    @media (max-width: 768px) {
-        table.responsive thead {
-            @apply hidden;
-        }
-
-        table.responsive tbody tr {
-            @apply block py-3 border-b border-gray-200;
-        }
-
-        table.responsive tbody tr:last-child {
-            @apply border-b-0;
-        }
-
-        table.responsive td {
-            @apply flex justify-between items-center py-1 border-b-0 text-right;
-        }
-
-        table.responsive td::before {
-            content: attr(data-label);
-            @apply font-semibold text-xs uppercase tracking-wider text-gray-500 text-left mr-4 shrink-0;
-        }
-
-        table.responsive td:last-child {
-            @apply justify-end;
-        }
-    }
-}
-
 /* ===== Nav toggle (hamburger) ===== */
 @layer components {
     .nav-bar .nav-links {

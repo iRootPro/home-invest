@@ -37,8 +37,14 @@ func (h *StatsHandler) Index(w http.ResponseWriter, r *http.Request) {
 		members, banks, matrix, _ = models.DepositMatrixForMember(h.DB, memberID)
 	}
 
+	var totalAmount float64
+	for _, bs := range bankStats {
+		totalAmount += bs.Total
+	}
+
 	templateutil.Render(w, "stats/index.html", map[string]any{
-		"BankStats":   bankStats,
+		"BankStats":    bankStats,
+		"TotalAmount":  totalAmount,
 		"MemberStats": memberStats,
 		"ASVEntries":  asvEntries,
 		"Members":     members,
