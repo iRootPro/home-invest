@@ -32,10 +32,18 @@ DEPLOY_HOST = 192.168.1.165
 DEPLOY_USER = root
 IMAGE_NAME = banki
 
+REPO_URL = git@github.com:iRootPro/home-invest.git
+
 deploy:
-	rsync -az --delete --filter=':- .dockerignore' . $(DEPLOY_USER)@$(DEPLOY_HOST):~/banki/src/
-	scp docker-compose.yml $(DEPLOY_USER)@$(DEPLOY_HOST):~/banki/
-	ssh $(DEPLOY_USER)@$(DEPLOY_HOST) "cd ~/banki/src && docker build -t $(IMAGE_NAME):latest . && cd ~/banki && docker compose up -d"
+	ssh $(DEPLOY_USER)@$(DEPLOY_HOST) "\
+		if [ ! -d ~/banki/src/.git ]; then \
+			git clone $(REPO_URL) ~/banki/src; \
+		else \
+			cd ~/banki/src && git pull; \
+		fi && \
+		cd ~/banki/src && docker build -t $(IMAGE_NAME):latest . && \
+		cp docker-compose.yml ~/banki/docker-compose.yml && \
+		cd ~/banki && docker compose up -d"
 
 deploy-logs:
 	ssh $(DEPLOY_USER)@$(DEPLOY_HOST) "cd ~/banki && docker compose logs -f --tail=100"
