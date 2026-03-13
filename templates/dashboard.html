@@ -15,6 +15,21 @@
         {{end}}
     </div>
 
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm px-5 py-4 text-center">
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Как держатель</div>
+            <div class="text-xl font-bold tabular-nums text-gray-900">{{formatAmount .RoleTotals.AsHolder}} ₽</div>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm px-5 py-4 text-center">
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Как владелец</div>
+            <div class="text-xl font-bold tabular-nums text-gray-900">{{formatAmount .RoleTotals.AsOwner}} ₽</div>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm px-5 py-4 text-center">
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Не свои</div>
+            <div class="text-xl font-bold tabular-nums text-gray-900">{{formatAmount .RoleTotals.NotOwn}} ₽</div>
+        </div>
+    </div>
+
     {{if .Expiring}}
     <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
         <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">

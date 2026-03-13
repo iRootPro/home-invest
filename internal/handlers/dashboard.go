@@ -20,6 +20,7 @@ func (h *DashboardHandler) Index(w http.ResponseWriter, r *http.Request) {
 	memberID := session.FamilyMemberID
 
 	var totalAmount float64
+	var roleTotals models.RoleTotals
 	var memberStats []models.MemberStat
 	var asvEntries []models.ASVEntry
 	var expiring []models.Deposit
@@ -28,6 +29,7 @@ func (h *DashboardHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	if isAdmin {
 		totalAmount, _ = models.TotalActiveAmount(h.DB)
+		roleTotals, _ = models.TotalsByRole(h.DB)
 		memberStats, _ = models.StatsByMember(h.DB)
 		asvEntries, _ = models.ASVCheck(h.DB)
 		expiring, _ = models.ExpiringDeposits(h.DB, 30)
@@ -35,6 +37,7 @@ func (h *DashboardHandler) Index(w http.ResponseWriter, r *http.Request) {
 		activeDeposits, _ = models.ListDeposits(h.DB, models.DepositFilter{Status: "active"})
 	} else {
 		totalAmount, _ = models.TotalActiveAmountForMember(h.DB, memberID)
+		roleTotals, _ = models.TotalsByRoleForMember(h.DB, memberID)
 		memberStats, _ = models.StatsByMemberFiltered(h.DB, memberID)
 		asvEntries, _ = models.ASVCheckForMember(h.DB, memberID)
 		expiring, _ = models.ExpiringDepositsForMember(h.DB, 30, memberID)
@@ -59,6 +62,7 @@ func (h *DashboardHandler) Index(w http.ResponseWriter, r *http.Request) {
 		"IsAdmin":             isAdmin,
 		"TotalAmount":         totalAmount,
 		"TotalExpectedProfit": totalExpectedProfit,
+		"RoleTotals":          roleTotals,
 		"MemberStats":         memberStats,
 		"ASVOver":             asvOver,
 		"Expiring":            expiring,

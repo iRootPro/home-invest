@@ -174,6 +174,35 @@ func MatrixKey(memberID, bankID int64) string {
 	return fmt.Sprintf("%d_%d", memberID, bankID)
 }
 
+type RoleTotals struct {
+	AsHolder float64
+	AsOwner  float64
+	NotOwn   float64 // holder_id != owner_id
+}
+
+func TotalsByRole(db *sql.DB) (RoleTotals, error) {
+	var rt RoleTotals
+	err := db.QueryRow(`
+		SELECT
+			COALESCE(SUM(amount), 0),
+			COALESCE(SUM(amount), 0),
+			COALESCE(SUM(CASE WHEN holder_id != owner_id THEN amount ELSE 0 END), 0)
+		FROM deposits WHERE status = 'active'`).Scan(&rt.AsHolder, &rt.AsOwner, &rt.NotOwn)
+	return rt, err
+}
+
+func TotalsByRoleForMember(db *sql.DB, memberID int64) (RoleTotals, error) {
+	var rt RoleTotals
+	row := db.QueryRow(`
+		SELECT
+			COALESCE((SELECT SUM(amount) FROM deposits WHERE status='active' AND holder_id = ?), 0),
+			COALESCE((SELECT SUM(amount) FROM deposits WHERE status='active' AND owner_id = ?), 0),
+			COALESCE((SELECT SUM(amount) FROM deposits WHERE status='active' AND holder_id = ? AND owner_id != ?), 0)`,
+		memberID, memberID, memberID, memberID)
+	err := row.Scan(&rt.AsHolder, &rt.AsOwner, &rt.NotOwn)
+	return rt, err
+}
+
 func TotalActiveAmount(db *sql.DB) (float64, error) {
 	var total float64
 	err := db.QueryRow("SELECT COALESCE(SUM(amount), 0) FROM deposits WHERE status = 'active'").Scan(&total)
