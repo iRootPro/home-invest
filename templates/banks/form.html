@@ -1,0 +1,37 @@
+{{define "banks/form.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "body"}}
+{{template "nav" .}}
+<main class="max-w-6xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-6">Редактирование банка</h1>
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+        <form method="POST" action="/banks/{{.Bank.ID}}" enctype="multipart/form-data">
+            <input type="hidden" name="_method" value="PUT">
+            <div class="mb-4">
+                <label>Название</label>
+                <input type="text" name="name" value="{{.Bank.Name}}" required>
+            </div>
+            <div class="mb-4">
+                <label>Заметки</label>
+                <input type="text" name="notes" value="{{.Bank.Notes}}">
+            </div>
+            <div class="mb-4">
+                <label>Логотип</label>
+                {{if .Bank.Logo}}
+                <div class="mb-2">
+                    <img src="/uploads/{{.Bank.Logo}}" class="h-10 w-10 rounded object-cover" alt="Текущий логотип">
+                </div>
+                {{end}}
+                <input type="file" name="logo" accept=".png,.jpg,.jpeg,.svg">
+                <p class="text-xs text-gray-400 mt-1">PNG, JPG или SVG, до 1 МБ</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-700 transition-colors cursor-pointer border-0">Сохранить</button>
+                <a href="/banks" class="py-2 px-6 rounded-md border border-gray-300 text-gray-700 no-underline font-medium text-sm hover:bg-gray-50 transition-colors">Отмена</a>
+            </div>
+        </form>
+    </div>
+</main>
+{{end}}

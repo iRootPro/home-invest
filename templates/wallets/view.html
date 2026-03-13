@@ -1,0 +1,80 @@
+{{define "wallets/view.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "body"}}
+{{template "nav" .}}
+<main class="max-w-6xl mx-auto px-4 py-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900">{{.Summary.Wallet.Name}}</h1>
+        <p class="text-sm text-gray-500 mt-1">Сводка по кошельку</p>
+    </div>
+
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">Общая сумма: {{formatAmount .Summary.TotalAmount}} ₽</h3>
+        </div>
+
+        {{if .Summary.MemberTotals}}
+        <div class="p-4 overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+                <thead>
+                    <tr>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left">Участник</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right">Как держатель</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right">Как владелец</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Summary.MemberTotals}}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-2 border-b border-gray-100">{{.Member.Name}}</td>
+                        <td class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .AsHolder}} ₽</td>
+                        <td class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .AsOwner}} ₽</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{end}}
+    </div>
+
+    {{if .Summary.Deposits}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">Вклады участников</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="responsive w-full text-sm border-collapse">
+                <thead>
+                    <tr>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Банк</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Держатель</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Владелец</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right whitespace-nowrap">Сумма</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Ставка</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Окончание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Summary.Deposits}}
+                    <tr class="hover:bg-gray-50">
+                        <td data-label="Банк" class="px-3 py-2 border-b border-gray-100">{{.BankName}}</td>
+                        <td data-label="Держатель" class="px-3 py-2 border-b border-gray-100">{{.HolderName}}</td>
+                        <td data-label="Владелец" class="px-3 py-2 border-b border-gray-100">{{.OwnerName}}</td>
+                        <td data-label="Сумма" class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .Amount}} ₽</td>
+                        <td data-label="Ставка" class="px-3 py-2 border-b border-gray-100">{{.InterestRate}}%</td>
+                        <td data-label="Окончание" class="px-3 py-2 border-b border-gray-100">{{formatDate .EndDate}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{else}}
+    <p class="text-sm text-gray-500 mb-6">Нет активных вкладов у участников кошелька.</p>
+    {{end}}
+
+    <a href="/wallets" class="inline-block py-2 px-6 rounded-md border border-gray-300 text-gray-700 no-underline font-medium text-sm hover:bg-gray-50 transition-colors">Назад к кошелькам</a>
+</main>
+{{end}}

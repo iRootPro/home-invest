@@ -1,0 +1,107 @@
+@import "tailwindcss";
+@source "../../templates/**/*.html";
+
+@theme {
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ===== Base form styles ===== */
+@layer base {
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    input[type="email"],
+    select {
+        @apply w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20;
+    }
+
+    input[type="checkbox"] {
+        @apply rounded border-gray-300 text-blue-600 focus:ring-blue-500/20;
+    }
+
+    label {
+        @apply block text-sm font-medium text-gray-700 mb-1;
+    }
+
+    fieldset {
+        @apply border border-gray-200 rounded-lg p-4 mb-4;
+    }
+
+    legend {
+        @apply text-sm font-semibold text-gray-700 px-2;
+    }
+}
+
+/* ===== Responsive tables ===== */
+@layer components {
+    @media (max-width: 768px) {
+        table.responsive thead {
+            @apply hidden;
+        }
+
+        table.responsive tbody tr {
+            @apply block py-3 border-b border-gray-200;
+        }
+
+        table.responsive tbody tr:last-child {
+            @apply border-b-0;
+        }
+
+        table.responsive td {
+            @apply flex justify-between items-center py-1 border-b-0 text-right;
+        }
+
+        table.responsive td::before {
+            content: attr(data-label);
+            @apply font-semibold text-xs uppercase tracking-wider text-gray-500 text-left mr-4 shrink-0;
+        }
+
+        table.responsive td:last-child {
+            @apply justify-end;
+        }
+    }
+}
+
+/* ===== Nav toggle (hamburger) ===== */
+@layer components {
+    .nav-bar .nav-links {
+        @apply hidden md:flex;
+    }
+
+    .nav-bar[data-open] .nav-links {
+        @apply flex flex-col absolute top-14 left-0 right-0 bg-white border-b border-gray-200 py-2 px-4 shadow-lg z-50;
+    }
+
+    .nav-bar[data-open] .nav-links a {
+        @apply w-full py-3;
+    }
+
+    .nav-bar[data-open] .nav-links .nav-logout {
+        @apply border-t border-gray-200 pt-2 mt-1;
+    }
+}
+
+/* ===== Details/Summary toggle ===== */
+@layer components {
+    details summary {
+        @apply inline-flex items-center px-4 py-2 text-sm font-semibold text-blue-600 bg-white border border-blue-600 rounded-lg cursor-pointer transition-colors hover:bg-blue-50 list-none;
+    }
+
+    details summary::-webkit-details-marker {
+        display: none;
+    }
+
+    details summary::before {
+        content: "+ ";
+        @apply font-bold mr-1;
+    }
+
+    details[open] summary::before {
+        content: "− ";
+    }
+
+    details[open] summary {
+        @apply mb-4;
+    }
+}

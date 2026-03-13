@@ -1,0 +1,108 @@
+{{define "dashboard.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "body"}}
+{{template "nav" .}}
+<main class="max-w-6xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-6">Дашборд</h1>
+
+    <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl text-white text-center px-6 py-8 mb-6 shadow-md">
+        <div class="text-sm opacity-85 font-medium mb-1">Общая сумма вкладов</div>
+        <div class="text-3xl md:text-4xl font-bold tabular-nums tracking-tight">{{formatAmount .TotalAmount}} ₽</div>
+        {{if .TotalExpectedProfit}}
+        <div class="mt-2 text-sm opacity-85">Ожидаемый доход ≈ {{formatAmount .TotalExpectedProfit}} ₽</div>
+        {{end}}
+    </div>
+
+    {{if .Expiring}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">Истекают в ближайшие 30 дней</h3>
+        </div>
+        <div class="p-4 overflow-x-auto">
+            <table class="responsive w-full text-sm border-collapse">
+                <thead>
+                    <tr>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Банк</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Держатель</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right whitespace-nowrap">Сумма</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Окончание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Expiring}}
+                    <tr class="hover:bg-gray-50">
+                        <td data-label="Банк" class="px-3 py-2 border-b border-gray-100">
+                            <span class="inline-flex items-center gap-1">
+                            {{if .BankLogo}}
+                            <img src="/uploads/{{.BankLogo}}" class="h-5 w-5 inline rounded object-cover" alt="">
+                            {{else}}
+                            <span class="inline-flex items-center justify-center h-5 w-5 rounded bg-blue-100 text-blue-700 text-xs font-bold">{{slice .BankName 0 1}}</span>
+                            {{end}}
+                            {{.BankName}}
+                            </span>
+                            {{$asvKey := printf "%d_%d" .HolderID .BankID}}
+                            {{if index $.ASVOver $asvKey}}
+                            <span title="Превышен лимит АСВ (1 400 000 ₽)" class="inline-block align-middle ml-1 text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            </span>
+                            {{end}}
+                        </td>
+                        <td data-label="Держатель" class="px-3 py-2 border-b border-gray-100">{{.HolderName}}</td>
+                        <td data-label="Сумма" class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .Amount}} ₽</td>
+                        <td data-label="Окончание" class="px-3 py-2 border-b border-gray-100">{{formatDate .EndDate}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{end}}
+
+    {{if .MemberStats}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">По членам семьи</h3>
+        </div>
+        <div class="p-4 overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+                <thead>
+                    <tr>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left">Имя</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right">Как держатель</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right">Как владелец</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .MemberStats}}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-2 border-b border-gray-100">{{.MemberName}}</td>
+                        <td class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .AsHolder}} ₽</td>
+                        <td class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .AsOwner}} ₽</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{end}}
+
+    {{if .Wallets}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">Кошельки</h3>
+        </div>
+        <div class="p-4">
+            <div class="flex flex-wrap gap-2">
+                {{range .Wallets}}
+                <a href="/wallets/{{.ID}}" class="inline-block px-4 py-2 bg-gray-50 border border-gray-200 rounded-md text-blue-600 no-underline text-sm font-medium transition-colors hover:bg-blue-50 hover:border-blue-600">{{.Name}}</a>
+                {{end}}
+            </div>
+        </div>
+    </div>
+    {{end}}
+</main>
+{{end}}

@@ -1,0 +1,38 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Банки — Учёт вкладов</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+    {{block "body" .}}{{end}}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggle = document.querySelector('.nav-toggle');
+        var nav = document.querySelector('.nav-bar');
+        if (toggle && nav) {
+            toggle.addEventListener('click', function() {
+                nav.toggleAttribute('data-open');
+            });
+        }
+        var path = location.pathname;
+        document.querySelectorAll('.nav-links a[href]').forEach(function(a) {
+            var href = a.getAttribute('href');
+            if (href === '/' && path === '/') {
+                a.classList.add('active');
+            } else if (href !== '/' && path.startsWith(href)) {
+                a.classList.add('active');
+            }
+        });
+    });
+    </script>
+</body>
+</html>
+{{end}}

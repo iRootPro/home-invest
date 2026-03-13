@@ -1,0 +1,115 @@
+{{define "deposits/list.html"}}
+{{if .ActiveDeposits}}
+<h2 class="text-lg font-semibold text-gray-800 mb-3">Активные вклады</h2>
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+    <div class="overflow-x-auto">
+        <table class="responsive w-full text-sm border-collapse">
+            <thead>
+                <tr>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Банк</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Держатель</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Владелец</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right whitespace-nowrap">Сумма</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Ставка</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right whitespace-nowrap">Доход ≈</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Открыт</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Окончание</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .ActiveDeposits}}
+                <tr class="hover:bg-gray-50">
+                    <td data-label="Банк" class="px-3 py-2 border-b border-gray-100">
+                        <span class="inline-flex items-center gap-1">
+                        {{if .BankLogo}}
+                        <img src="/uploads/{{.BankLogo}}" class="h-5 w-5 inline rounded object-cover" alt="">
+                        {{else}}
+                        <span class="inline-flex items-center justify-center h-5 w-5 rounded bg-blue-100 text-blue-700 text-xs font-bold">{{slice .BankName 0 1}}</span>
+                        {{end}}
+                        {{.BankName}}
+                        </span>
+                        {{$asvKey := printf "%d_%d" .HolderID .BankID}}
+                        {{if index $.ASVOver $asvKey}}
+                        <span title="Превышен лимит АСВ (1 400 000 ₽)" class="inline-block align-middle ml-1 text-red-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </span>
+                        {{end}}
+                    </td>
+                    <td data-label="Держатель" class="px-3 py-2 border-b border-gray-100">{{.HolderName}}</td>
+                    <td data-label="Владелец" class="px-3 py-2 border-b border-gray-100">{{.OwnerName}}</td>
+                    <td data-label="Сумма" class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .Amount}} ₽</td>
+                    <td data-label="Ставка" class="px-3 py-2 border-b border-gray-100">{{.InterestRate}}%</td>
+                    <td data-label="Доход" class="px-3 py-2 border-b border-gray-100 text-right tabular-nums text-green-700">
+                        {{formatAmount .TotalProfit}} ₽
+                    </td>
+                    <td data-label="Открыт" class="px-3 py-2 border-b border-gray-100">{{formatDate .OpenDate}}</td>
+                    <td data-label="Окончание" class="px-3 py-2 border-b border-gray-100">{{formatDate .EndDate}}</td>
+                    <td data-label="Действия" class="px-3 py-2 border-b border-gray-100">
+                        <span class="flex items-center gap-1 flex-wrap">
+                            <a href="/deposits/{{.ID}}/edit" class="px-2.5 py-1 text-xs border border-gray-300 rounded-md bg-white text-gray-500 no-underline font-medium transition-colors hover:text-gray-900 hover:border-gray-400 hover:bg-gray-50">Изменить</a>
+                            <form method="POST" action="/deposits/{{.ID}}/close" class="inline m-0"
+                                  onsubmit="return confirm('Закрыть вклад?')">
+                                <button type="submit" class="px-2.5 py-1 text-xs border border-gray-300 rounded-md bg-white text-gray-500 font-medium cursor-pointer transition-colors hover:text-red-600 hover:border-red-600 hover:bg-red-50">Закрыть</button>
+                            </form>
+                        </span>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{else}}
+<p class="text-sm text-gray-500">Активных вкладов не найдено.</p>
+{{end}}
+
+{{if .ClosedDeposits}}
+<h2 class="text-lg font-medium text-gray-400 mb-3 mt-6">Закрытые вклады</h2>
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm opacity-75">
+    <div class="overflow-x-auto">
+        <table class="responsive w-full text-sm border-collapse">
+            <thead>
+                <tr>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-400 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Банк</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-400 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Держатель</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-400 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Владелец</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-400 border-b-2 border-gray-200 px-3 py-2 text-right whitespace-nowrap">Сумма</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-400 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Ставка</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-400 border-b-2 border-gray-200 px-3 py-2 text-right whitespace-nowrap">Доход ≈</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-400 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Открыт</th>
+                    <th class="font-semibold text-xs uppercase tracking-wider text-gray-400 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Окончание</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .ClosedDeposits}}
+                <tr class="hover:bg-gray-50">
+                    <td data-label="Банк" class="px-3 py-2 border-b border-gray-100">
+                        <span class="inline-flex items-center gap-1">
+                        {{if .BankLogo}}
+                        <img src="/uploads/{{.BankLogo}}" class="h-5 w-5 inline rounded object-cover" alt="">
+                        {{else}}
+                        <span class="inline-flex items-center justify-center h-5 w-5 rounded bg-blue-100 text-blue-700 text-xs font-bold">{{slice .BankName 0 1}}</span>
+                        {{end}}
+                        {{.BankName}}
+                        </span>
+                    </td>
+                    <td data-label="Держатель" class="px-3 py-2 border-b border-gray-100">{{.HolderName}}</td>
+                    <td data-label="Владелец" class="px-3 py-2 border-b border-gray-100">{{.OwnerName}}</td>
+                    <td data-label="Сумма" class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .Amount}} ₽</td>
+                    <td data-label="Ставка" class="px-3 py-2 border-b border-gray-100">{{.InterestRate}}%</td>
+                    <td data-label="Доход" class="px-3 py-2 border-b border-gray-100 text-right tabular-nums text-green-700">
+                        {{formatAmount .TotalProfit}} ₽
+                    </td>
+                    <td data-label="Открыт" class="px-3 py-2 border-b border-gray-100">{{formatDate .OpenDate}}</td>
+                    <td data-label="Окончание" class="px-3 py-2 border-b border-gray-100">{{formatDate .EndDate}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{end}}
+{{end}}

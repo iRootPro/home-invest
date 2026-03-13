@@ -1,0 +1,146 @@
+{{define "deposits/index.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "body"}}
+{{template "nav" .}}
+<main class="max-w-6xl mx-auto px-4 py-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900">Вклады</h1>
+        <p class="text-sm text-gray-500 mt-1">Управление вкладами</p>
+    </div>
+
+    <details class="mb-6">
+        <summary>Добавить вклад</summary>
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+            <form method="POST" action="/deposits" id="deposit-form">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label for="create-bank">Банк</label>
+                        <select name="bank_id" id="create-bank" required
+                            hx-get="/api/asv-check" hx-target="#asv-create-warning"
+                            hx-include="[name='holder_id'],[name='amount']"
+                            hx-trigger="change">
+                            <option value="">Выберите банк</option>
+                            {{range .Banks}}
+                            <option value="{{.ID}}">{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="create-holder">Держатель (на чьё имя)</label>
+                        <select name="holder_id" id="create-holder" required
+                            hx-get="/api/asv-check" hx-target="#asv-create-warning"
+                            hx-include="[name='bank_id'],[name='amount']"
+                            hx-trigger="change">
+                            <option value="">Выберите</option>
+                            {{range .Members}}
+                            <option value="{{.ID}}">{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="create-owner">Владелец (чьи деньги)</label>
+                        <select name="owner_id" id="create-owner" required>
+                            <option value="">Выберите</option>
+                            {{range .Members}}
+                            <option value="{{.ID}}">{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label>Сумма (₽)</label>
+                        <input type="number" name="amount" step="0.01" min="0" required
+                            hx-get="/api/asv-check" hx-target="#asv-create-warning"
+                            hx-include="[name='bank_id'],[name='holder_id']"
+                            hx-trigger="change, keyup changed delay:500ms">
+                    </div>
+                    <div>
+                        <label>Ставка (%)</label>
+                        <input type="number" name="interest_rate" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label>Дата открытия</label>
+                        <input type="date" name="open_date" required>
+                    </div>
+                    <div>
+                        <label>Дата окончания</label>
+                        <input type="date" name="end_date" required>
+                    </div>
+                </div>
+                <div class="flex gap-6 mb-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="has_capitalization">
+                        <span>Капитализация</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="is_replenishable">
+                        <span>Пополняемый</span>
+                    </label>
+                </div>
+                <div class="mb-4">
+                    <label>Заметки</label>
+                    <input type="text" name="notes" placeholder="Комментарий">
+                </div>
+                <div id="asv-create-warning" class="mb-4"></div>
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-700 transition-colors cursor-pointer border-0">Создать вклад</button>
+            </form>
+        </div>
+    </details>
+
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">Фильтры</h3>
+        </div>
+        <div class="p-4">
+            <form hx-get="/deposits/list" hx-target="#deposits-list" hx-trigger="change">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label>Банк</label>
+                        <select name="bank_id">
+                            <option value="">Все</option>
+                            {{range .Banks}}
+                            <option value="{{.ID}}" {{if eq .ID $.Filter.BankID}}selected{{end}}>{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Держатель</label>
+                        <select name="holder_id">
+                            <option value="">Все</option>
+                            {{range .Members}}
+                            <option value="{{.ID}}" {{if eq .ID $.Filter.HolderID}}selected{{end}}>{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Владелец</label>
+                        <select name="owner_id">
+                            <option value="">Все</option>
+                            {{range .Members}}
+                            <option value="{{.ID}}" {{if eq .ID $.Filter.OwnerID}}selected{{end}}>{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Статус</label>
+                        <select name="status">
+                            <option value="">Все</option>
+                            <option value="active" {{if eq $.Filter.Status "active"}}selected{{end}}>Активные</option>
+                            <option value="closed" {{if eq $.Filter.Status "closed"}}selected{{end}}>Закрытые</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="deposits-list">
+        {{template "deposits/list.html" .}}
+    </div>
+</main>
+{{end}}

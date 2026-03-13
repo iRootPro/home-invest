@@ -1,0 +1,8 @@
+banki
+banki.db*
+bin/
+.git/
+.claude/
+uploads/
+static/css/app.css
+*.tar

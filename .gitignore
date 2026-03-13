@@ -1,0 +1,9 @@
+bin/
+banki
+banki.db
+banki.db-shm
+banki.db-wal
+static/css/app.css
+uploads/
+.env
+*.tar

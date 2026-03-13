@@ -1,0 +1,79 @@
+{{define "deposits/form.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "body"}}
+{{template "nav" .}}
+<main class="max-w-6xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-6">Редактирование вклада</h1>
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+        <form method="POST" action="/deposits/{{.Deposit.ID}}">
+            <input type="hidden" name="_method" value="PUT">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label>Банк</label>
+                    <select name="bank_id" required>
+                        {{range .Banks}}
+                        <option value="{{.ID}}" {{if eq .ID $.Deposit.BankID}}selected{{end}}>{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+                <div>
+                    <label>Держатель</label>
+                    <select name="holder_id" required>
+                        {{range .Members}}
+                        <option value="{{.ID}}" {{if eq .ID $.Deposit.HolderID}}selected{{end}}>{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+                <div>
+                    <label>Владелец</label>
+                    <select name="owner_id" required>
+                        {{range .Members}}
+                        <option value="{{.ID}}" {{if eq .ID $.Deposit.OwnerID}}selected{{end}}>{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label>Сумма (₽)</label>
+                    <input type="number" name="amount" step="0.01" min="0" value="{{.Deposit.Amount}}" required>
+                </div>
+                <div>
+                    <label>Ставка (%)</label>
+                    <input type="number" name="interest_rate" step="0.01" min="0" value="{{.Deposit.InterestRate}}" required>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label>Дата открытия</label>
+                    <input type="date" name="open_date" value="{{.Deposit.OpenDate}}" required>
+                </div>
+                <div>
+                    <label>Дата окончания</label>
+                    <input type="date" name="end_date" value="{{.Deposit.EndDate}}" required>
+                </div>
+            </div>
+            <div class="flex gap-6 mb-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="has_capitalization" {{if .Deposit.HasCapitalization}}checked{{end}}>
+                    <span>Капитализация</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="is_replenishable" {{if .Deposit.IsReplenishable}}checked{{end}}>
+                    <span>Пополняемый</span>
+                </label>
+            </div>
+            <div class="mb-4">
+                <label>Заметки</label>
+                <input type="text" name="notes" value="{{.Deposit.Notes}}">
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-700 transition-colors cursor-pointer border-0">Сохранить</button>
+                <a href="/deposits" class="py-2 px-6 rounded-md border border-gray-300 text-gray-700 no-underline font-medium text-sm hover:bg-gray-50 transition-colors">Отмена</a>
+            </div>
+        </form>
+    </div>
+</main>
+{{end}}

@@ -1,0 +1,21 @@
+services:
+  banki:
+    image: banki:latest
+    container_name: banki
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      BANKI_DB_PATH: /app/data/banki.db
+      BANKI_UPLOADS_DIR: /app/uploads
+      BANKI_LISTEN_ADDR: ":8080"
+      BANKI_SESSION_SECRET: "${BANKI_SESSION_SECRET:?Set BANKI_SESSION_SECRET}"
+      BANKI_DEFAULT_USER: "${BANKI_DEFAULT_USER:-admin}"
+      BANKI_DEFAULT_PASS: "${BANKI_DEFAULT_PASS:-admin}"
+    volumes:
+      - banki-data:/app/data
+      - banki-uploads:/app/uploads
+
+volumes:
+  banki-data:
+  banki-uploads:

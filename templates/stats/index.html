@@ -1,0 +1,150 @@
+{{define "stats/index.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "body"}}
+{{template "nav" .}}
+<main class="max-w-6xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-6">Статистика</h1>
+
+    {{if .BankStats}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">По банкам</h3>
+        </div>
+        <div class="p-4 overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+                <thead>
+                    <tr>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left">Банк</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right">Сумма</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left">Кол-во вкладов</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .BankStats}}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-2 border-b border-gray-100">{{.BankName}}</td>
+                        <td class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .Total}} ₽</td>
+                        <td class="px-3 py-2 border-b border-gray-100">{{.Count}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{end}}
+
+    {{if .MemberStats}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">По членам семьи</h3>
+        </div>
+        <div class="p-4 overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+                <thead>
+                    <tr>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left">Имя</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right">Как держатель</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right">Как владелец</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .MemberStats}}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-2 border-b border-gray-100">{{.MemberName}}</td>
+                        <td class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .AsHolder}} ₽</td>
+                        <td class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .AsOwner}} ₽</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{end}}
+
+    {{if .ASVEntries}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">Таблица АСВ</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="responsive w-full text-sm border-collapse">
+                <thead>
+                    <tr>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Держатель</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">Банк</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right whitespace-nowrap">Сумма</th>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left whitespace-nowrap">% лимита</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .ASVEntries}}
+                    <tr class="hover:bg-gray-50">
+                        <td data-label="Держатель" class="px-3 py-2 border-b border-gray-100">{{.HolderName}}</td>
+                        <td data-label="Банк" class="px-3 py-2 border-b border-gray-100">{{.BankName}}</td>
+                        <td data-label="Сумма" class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums">{{formatAmount .Total}} ₽</td>
+                        <td data-label="% лимита" class="px-3 py-2 border-b border-gray-100">
+                            <div class="flex items-center gap-2">
+                                <span class="{{if eq .Color "red"}}text-red-600 font-semibold{{else if eq .Color "orange"}}text-amber-600{{else}}text-green-600{{end}}">{{printf "%.1f" .Percent}}%</span>
+                                <div class="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden shrink-0">
+                                    <div class="h-full rounded-full {{if eq .Color "red"}}bg-red-500{{else if eq .Color "orange"}}bg-amber-500{{else}}bg-green-500{{end}}" style="width: {{if gt .Percent 100.0}}100{{else}}{{printf "%.0f" .Percent}}{{end}}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        <div class="px-5 py-3">
+            <p class="text-xs text-gray-500">Лимит АСВ: {{formatAmount .ASVLimit}} ₽</p>
+        </div>
+    </div>
+    {{end}}
+
+    {{if and .Members .Banks}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div class="px-5 py-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+            <h3 class="text-sm font-semibold text-gray-900">Матрица «банк × член семьи»</h3>
+        </div>
+        <div class="overflow-x-auto p-4">
+            <table class="w-full text-sm border-collapse">
+                <thead>
+                    <tr>
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-left">Банк</th>
+                        {{range .Members}}
+                        <th class="font-semibold text-xs uppercase tracking-wider text-gray-500 border-b-2 border-gray-200 px-3 py-2 text-right whitespace-nowrap">{{.Name}}</th>
+                        {{end}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{$matrix := .Matrix}}
+                    {{$members := .Members}}
+                    {{range .Banks}}
+                    {{$bank := .}}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-2 border-b border-gray-100"><strong class="font-semibold whitespace-nowrap">{{.Name}}</strong></td>
+                        {{range $members}}
+                        {{$key := printf "%d_%d" .ID $bank.ID}}
+                        {{$cell := index $matrix $key}}
+                        <td class="px-3 py-2 border-b border-gray-100 text-right font-medium tabular-nums whitespace-nowrap">
+                            {{if $cell.HasDeposit}}
+                            {{if ge (pct $cell.Total 1400000) 100.0}}<span class="text-red-600 font-semibold">{{formatAmount $cell.Total}} ₽</span>
+                            {{else if ge (pct $cell.Total 1400000) 80.0}}<span class="text-amber-600">{{formatAmount $cell.Total}} ₽</span>
+                            {{else}}<span class="text-green-600">{{formatAmount $cell.Total}} ₽</span>
+                            {{end}}
+                            {{else}}
+                            <span class="text-gray-300">—</span>
+                            {{end}}
+                        </td>
+                        {{end}}
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{end}}
+</main>
+{{end}}

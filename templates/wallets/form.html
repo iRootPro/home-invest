@@ -1,0 +1,35 @@
+{{define "wallets/form.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "body"}}
+{{template "nav" .}}
+<main class="max-w-6xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-6">Редактирование кошелька</h1>
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+        <form method="POST" action="/wallets/{{.Wallet.ID}}">
+            <input type="hidden" name="_method" value="PUT">
+            <div class="mb-4">
+                <label>Название</label>
+                <input type="text" name="name" value="{{.Wallet.Name}}" required>
+            </div>
+            <fieldset class="mb-4">
+                <legend>Участники</legend>
+                <div class="flex flex-col gap-2">
+                    {{range .Members}}
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="member_ids" value="{{.ID}}"
+                            {{if index $.MemberSet .ID}}checked{{end}}>
+                        <span>{{.Name}}</span>
+                    </label>
+                    {{end}}
+                </div>
+            </fieldset>
+            <div class="flex items-center gap-3">
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-700 transition-colors cursor-pointer border-0">Сохранить</button>
+                <a href="/wallets" class="py-2 px-6 rounded-md border border-gray-300 text-gray-700 no-underline font-medium text-sm hover:bg-gray-50 transition-colors">Отмена</a>
+            </div>
+        </form>
+    </div>
+</main>
+{{end}}

@@ -1,0 +1,52 @@
+{{define "family_members/form.html"}}
+{{template "base" .}}
+{{end}}
+
+{{define "body"}}
+{{template "nav" .}}
+<main class="max-w-6xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-6">Редактирование</h1>
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5">
+        <form method="POST" action="/members/{{.Member.ID}}">
+            <input type="hidden" name="_method" value="PUT">
+            <div class="mb-4">
+                <label>Имя</label>
+                <input type="text" name="name" value="{{.Member.Name}}" required>
+            </div>
+
+            <fieldset class="mb-4">
+                <legend>Доступ в систему</legend>
+                {{if .User}}
+                <p class="text-sm text-gray-700 mb-3">Текущий логин: <strong class="font-semibold">{{.User.Username}}</strong></p>
+                <div class="mb-3">
+                    <label>Новый пароль (оставьте пустым, чтобы не менять)</label>
+                    <input type="password" name="password" placeholder="Новый пароль">
+                </div>
+                <input type="hidden" name="username" value="{{.User.Username}}">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="remove_login">
+                    <span>Удалить доступ в систему</span>
+                </label>
+                {{else}}
+                <p class="text-sm text-gray-500 mb-3">Нет доступа в систему.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label>Логин</label>
+                        <input type="text" name="username" placeholder="ivan">
+                    </div>
+                    <div>
+                        <label>Пароль</label>
+                        <input type="password" name="password" placeholder="Пароль">
+                    </div>
+                </div>
+                {{end}}
+            </fieldset>
+
+            <div class="flex items-center gap-3">
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-700 transition-colors cursor-pointer border-0">Сохранить</button>
+                <a href="/members" class="py-2 px-6 rounded-md border border-gray-300 text-gray-700 no-underline font-medium text-sm hover:bg-gray-50 transition-colors">Отмена</a>
+            </div>
+        </form>
+    </div>
+</main>
+{{end}}

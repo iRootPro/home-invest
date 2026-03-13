@@ -1,0 +1,15 @@
+{{define "partials/asv_warning.html"}}
+{{if gt .Total 0.0}}
+<div class="flex flex-col gap-2 px-4 py-3 rounded-lg mb-3 border-l-4 {{if ge .Percent 100.0}}bg-red-50 border-red-500{{else if ge .Percent 80.0}}bg-amber-50 border-amber-500{{else}}bg-green-50 border-green-500{{end}}">
+    <div class="flex justify-between items-center text-sm flex-wrap gap-1">
+        <span><strong class="font-semibold">АСВ:</strong> {{formatAmount .Total}} ₽ из {{formatAmount .Limit}} ₽</span>
+        <span class="font-bold text-sm {{if ge .Percent 100.0}}text-red-600{{else if ge .Percent 80.0}}text-amber-600{{else}}text-green-600{{end}}">{{printf "%.1f" .Percent}}%
+            {{if ge .Percent 100.0}} — Превышен лимит!{{else if ge .Percent 80.0}} — Приближение к лимиту{{end}}
+        </span>
+    </div>
+    <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div class="h-full rounded-full transition-all duration-300 {{if ge .Percent 100.0}}bg-red-500{{else if ge .Percent 80.0}}bg-amber-500{{else}}bg-green-500{{end}}" style="width: {{if gt .Percent 100.0}}100{{else}}{{printf "%.0f" .Percent}}{{end}}%"></div>
+    </div>
+</div>
+{{end}}
+{{end}}
