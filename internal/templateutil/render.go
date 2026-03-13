@@ -32,7 +32,7 @@ func Init(fsys fs.FS) error {
 			return t.Format("02.01.2006")
 		},
 		"formatAmount": func(f float64) string {
-			return addThousandsSep(fmt.Sprintf("%.2f", f))
+			return formatHuman(f)
 		},
 		"pct": func(a, b float64) float64 {
 			if b == 0 {
@@ -155,6 +155,33 @@ func RenderPartial(w http.ResponseWriter, name string, data any) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := t.ExecuteTemplate(w, name, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func formatHuman(f float64) string {
+	sign := ""
+	if f < 0 {
+		sign = "-"
+		f = -f
+	}
+	switch {
+	case f >= 1_000_000:
+		v := f / 1_000_000
+		if v == float64(int(v)) {
+			return fmt.Sprintf("%s%d млн", sign, int(v))
+		}
+		return fmt.Sprintf("%s%.1f млн", sign, v)
+	case f >= 1_000:
+		v := f / 1_000
+		if v == float64(int(v)) {
+			return fmt.Sprintf("%s%d тыс.", sign, int(v))
+		}
+		return fmt.Sprintf("%s%.1f тыс.", sign, v)
+	default:
+		if f == float64(int(f)) {
+			return fmt.Sprintf("%s%d", sign, int(f))
+		}
+		return fmt.Sprintf("%s%.2f", sign, f)
 	}
 }
 
