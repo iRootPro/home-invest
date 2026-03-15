@@ -14,6 +14,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+type HolderGroup struct {
+	HolderName  string
+	TotalAmount float64
+	Count       int
+	Deposits    []models.Deposit
+}
+
 type DepositsHandler struct {
 	DB *sql.DB
 }
@@ -41,15 +48,39 @@ func (h *DepositsHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	asvOver := h.buildASVOver(isAdmin, memberID)
 
+	var holderGroups []HolderGroup
+	groupByHolder := isAdmin && f.HolderID == 0
+
+	if groupByHolder {
+		groupMap := make(map[int64]*HolderGroup)
+		var groupOrder []int64
+		for _, d := range activeDeposits {
+			g, ok := groupMap[d.HolderID]
+			if !ok {
+				g = &HolderGroup{HolderName: d.HolderName}
+				groupMap[d.HolderID] = g
+				groupOrder = append(groupOrder, d.HolderID)
+			}
+			g.Deposits = append(g.Deposits, d)
+			g.TotalAmount += d.Amount
+			g.Count++
+		}
+		for _, id := range groupOrder {
+			holderGroups = append(holderGroups, *groupMap[id])
+		}
+	}
+
 	templateutil.Render(w, "deposits/index.html", map[string]any{
 		"ActiveDeposits": activeDeposits,
 		"ClosedDeposits": closedDeposits,
-		"Banks":    banks,
-		"Members":  members,
-		"Filter":   f,
-		"IsAdmin":  isAdmin,
-		"MemberID": memberID,
-		"ASVOver":  asvOver,
+		"Banks":          banks,
+		"Members":        members,
+		"Filter":         f,
+		"IsAdmin":        isAdmin,
+		"MemberID":       memberID,
+		"ASVOver":        asvOver,
+		"HolderGroups":   holderGroups,
+		"GroupByHolder":  groupByHolder,
 	})
 }
 
@@ -73,11 +104,35 @@ func (h *DepositsHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	asvOver := h.buildASVOver(isAdmin, memberID)
 
+	var holderGroups []HolderGroup
+	groupByHolder := isAdmin && f.HolderID == 0
+
+	if groupByHolder {
+		groupMap := make(map[int64]*HolderGroup)
+		var groupOrder []int64
+		for _, d := range activeDeposits {
+			g, ok := groupMap[d.HolderID]
+			if !ok {
+				g = &HolderGroup{HolderName: d.HolderName}
+				groupMap[d.HolderID] = g
+				groupOrder = append(groupOrder, d.HolderID)
+			}
+			g.Deposits = append(g.Deposits, d)
+			g.TotalAmount += d.Amount
+			g.Count++
+		}
+		for _, id := range groupOrder {
+			holderGroups = append(holderGroups, *groupMap[id])
+		}
+	}
+
 	templateutil.RenderPartial(w, "deposits/list.html", map[string]any{
 		"ActiveDeposits": activeDeposits,
 		"ClosedDeposits": closedDeposits,
-		"IsAdmin":  isAdmin,
-		"ASVOver":  asvOver,
+		"IsAdmin":        isAdmin,
+		"ASVOver":        asvOver,
+		"HolderGroups":   holderGroups,
+		"GroupByHolder":  groupByHolder,
 	})
 }
 
