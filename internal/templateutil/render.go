@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io/fs"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -55,6 +56,17 @@ func Init(fsys fs.FS) error {
 		},
 		"seq": func(items ...any) []any {
 			return items
+		},
+		"formatFloat": func(f float64) string {
+			return strconv.FormatFloat(f, 'f', -1, 64)
+		},
+		"formatDateInput": func(s string) string {
+			for _, layout := range []string{"2006-01-02", time.RFC3339, "2006-01-02 15:04:05"} {
+				if t, err := time.Parse(layout, s); err == nil {
+					return t.Format("2006-01-02")
+				}
+			}
+			return s
 		},
 	}
 	cache = make(map[string]*template.Template)

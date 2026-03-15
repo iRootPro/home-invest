@@ -38,21 +38,21 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label>Сумма (₽)</label>
-                    <input type="number" name="amount" step="0.01" min="0" value="{{.Deposit.Amount}}" required>
+                    <input type="number" name="amount" step="0.01" min="0" value="{{formatFloat .Deposit.Amount}}" required>
                 </div>
                 <div>
                     <label>Ставка (%)</label>
-                    <input type="number" name="interest_rate" step="0.01" min="0" value="{{.Deposit.InterestRate}}" required>
+                    <input type="number" name="interest_rate" step="0.01" min="0" value="{{formatFloat .Deposit.InterestRate}}" required>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label>Дата открытия</label>
-                    <input type="date" name="open_date" value="{{.Deposit.OpenDate}}" required>
+                    <input type="date" name="open_date" value="{{formatDateInput .Deposit.OpenDate}}" required>
                 </div>
                 <div>
                     <label>Дата окончания</label>
-                    <input type="date" name="end_date" value="{{.Deposit.EndDate}}" required>
+                    <input type="date" name="end_date" value="{{formatDateInput .Deposit.EndDate}}" required>
                 </div>
             </div>
             <div class="flex gap-6 mb-4">
