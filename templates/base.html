@@ -32,6 +32,36 @@
             }
         });
     });
+
+    function formatAmountValue(str) {
+        str = str.replace(/[^\d.,]/g, '').replace(',', '.');
+        var parts = str.split('.');
+        var intPart = parts[0].replace(/^0+(?=\d)/, '');
+        var formatted = '';
+        for (var i = intPart.length - 1, c = 0; i >= 0; i--, c++) {
+            if (c > 0 && c % 3 === 0) formatted = ' ' + formatted;
+            formatted = intPart[i] + formatted;
+        }
+        if (parts.length > 1) formatted += '.' + parts[1];
+        return formatted;
+    }
+
+    function initAmountInputs() {
+        document.querySelectorAll('.amount-input').forEach(function(input) {
+            if (input.value) input.value = formatAmountValue(input.value);
+            input.addEventListener('input', function() {
+                var pos = input.selectionStart;
+                var before = input.value;
+                var spacesBefore = (before.slice(0, pos).match(/ /g) || []).length;
+                input.value = formatAmountValue(input.value);
+                var spacesAfter = (input.value.slice(0, pos).match(/ /g) || []).length;
+                var newPos = pos + spacesAfter - spacesBefore;
+                input.setSelectionRange(newPos, newPos);
+            });
+        });
+    }
+    initAmountInputs();
+    document.body.addEventListener('htmx:afterSwap', initAmountInputs);
     </script>
 </body>
 </html>

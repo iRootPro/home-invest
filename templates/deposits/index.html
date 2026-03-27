@@ -52,7 +52,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label>Сумма (₽)</label>
-                        <input type="number" name="amount" step="0.01" min="0" required
+                        <input type="text" name="amount" inputmode="decimal" class="amount-input" required
                             hx-get="/api/asv-check" hx-target="#asv-create-warning"
                             hx-include="[name='bank_id'],[name='holder_id']"
                             hx-trigger="change, keyup changed delay:500ms">

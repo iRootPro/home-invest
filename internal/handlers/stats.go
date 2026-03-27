@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"banki/internal/middleware"
 	"banki/internal/models"
@@ -58,7 +59,7 @@ func (h *StatsHandler) Index(w http.ResponseWriter, r *http.Request) {
 func (h *StatsHandler) ASVCheck(w http.ResponseWriter, r *http.Request) {
 	holderID, _ := strconv.ParseInt(r.URL.Query().Get("holder_id"), 10, 64)
 	bankID, _ := strconv.ParseInt(r.URL.Query().Get("bank_id"), 10, 64)
-	amountStr := r.URL.Query().Get("amount")
+	amountStr := strings.ReplaceAll(r.URL.Query().Get("amount"), " ", "")
 	newAmount, _ := strconv.ParseFloat(amountStr, 64)
 
 	if holderID == 0 || bankID == 0 {

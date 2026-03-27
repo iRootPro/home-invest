@@ -38,7 +38,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label>Сумма (₽)</label>
-                    <input type="number" name="amount" step="0.01" min="0" value="{{formatFloat .Deposit.Amount}}" required>
+                    <input type="text" name="amount" inputmode="decimal" class="amount-input" value="{{formatFloat .Deposit.Amount}}" required>
                 </div>
                 <div>
                     <label>Ставка (%)</label>
