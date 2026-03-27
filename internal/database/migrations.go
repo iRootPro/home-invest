@@ -60,6 +60,7 @@ var migrations = []string{
 	`CREATE INDEX IF NOT EXISTS idx_deposits_holder_bank_status ON deposits(holder_id, bank_id, status)`,
 	`CREATE INDEX IF NOT EXISTS idx_deposits_end_date ON deposits(end_date) WHERE status = 'active'`,
 	`ALTER TABLE banks ADD COLUMN logo TEXT DEFAULT ''`,
+	`ALTER TABLE deposits ADD COLUMN closed_amount REAL DEFAULT NULL`,
 }
 
 func Migrate(db *sql.DB) error {

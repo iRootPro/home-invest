@@ -19,11 +19,33 @@ type Deposit struct {
 	IsReplenishable   bool
 	Status            string
 	Notes             string
+	ClosedAmount      *float64
 	// Joined fields
 	BankName   string
 	BankLogo   string
 	HolderName string
 	OwnerName  string
+}
+
+// HasClosedAmount returns true if the deposit was closed with a recorded amount.
+func (d Deposit) HasClosedAmount() bool {
+	return d.ClosedAmount != nil
+}
+
+// ClosedAmountVal returns the closed amount value (0 if not set).
+func (d Deposit) ClosedAmountVal() float64 {
+	if d.ClosedAmount != nil {
+		return *d.ClosedAmount
+	}
+	return 0
+}
+
+// ActualProfit returns the actual profit (closed_amount - amount).
+func (d Deposit) ActualProfit() float64 {
+	if d.ClosedAmount != nil {
+		return *d.ClosedAmount - d.Amount
+	}
+	return 0
 }
 
 // TotalProfit returns the estimated profit for the entire deposit term.
@@ -87,7 +109,7 @@ type DepositFilter struct {
 func ListDeposits(db *sql.DB, f DepositFilter) ([]Deposit, error) {
 	query := `SELECT d.id, d.bank_id, d.holder_id, d.owner_id,
 		d.amount, d.interest_rate, d.open_date, d.end_date,
-		d.has_capitalization, d.is_replenishable, d.status, d.notes,
+		d.has_capitalization, d.is_replenishable, d.status, d.notes, d.closed_amount,
 		b.name, b.logo, h.name, o.name
 		FROM deposits d
 		JOIN banks b ON d.bank_id = b.id
@@ -130,7 +152,7 @@ func ListDeposits(db *sql.DB, f DepositFilter) ([]Deposit, error) {
 		if err := rows.Scan(
 			&d.ID, &d.BankID, &d.HolderID, &d.OwnerID,
 			&d.Amount, &d.InterestRate, &d.OpenDate, &d.EndDate,
-			&d.HasCapitalization, &d.IsReplenishable, &d.Status, &d.Notes,
+			&d.HasCapitalization, &d.IsReplenishable, &d.Status, &d.Notes, &d.ClosedAmount,
 			&d.BankName, &d.BankLogo, &d.HolderName, &d.OwnerName,
 		); err != nil {
 			return nil, err
@@ -144,7 +166,7 @@ func GetDeposit(db *sql.DB, id int64) (*Deposit, error) {
 	d := &Deposit{}
 	err := db.QueryRow(`SELECT d.id, d.bank_id, d.holder_id, d.owner_id,
 		d.amount, d.interest_rate, d.open_date, d.end_date,
-		d.has_capitalization, d.is_replenishable, d.status, d.notes,
+		d.has_capitalization, d.is_replenishable, d.status, d.notes, d.closed_amount,
 		b.name, b.logo, h.name, o.name
 		FROM deposits d
 		JOIN banks b ON d.bank_id = b.id
@@ -189,8 +211,8 @@ func UpdateDeposit(db *sql.DB, d *Deposit) error {
 	return err
 }
 
-func CloseDeposit(db *sql.DB, id int64) error {
-	_, err := db.Exec("UPDATE deposits SET status = 'closed', updated_at = CURRENT_TIMESTAMP WHERE id = ?", id)
+func CloseDeposit(db *sql.DB, id int64, closedAmount float64) error {
+	_, err := db.Exec("UPDATE deposits SET status = 'closed', closed_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", closedAmount, id)
 	return err
 }
 
@@ -200,7 +222,7 @@ func ExpiringDepositsForMember(db *sql.DB, days int, memberID int64) ([]Deposit,
 	deadline := time.Now().AddDate(0, 0, days).Format("2006-01-02")
 	query := `SELECT d.id, d.bank_id, d.holder_id, d.owner_id,
 		d.amount, d.interest_rate, d.open_date, d.end_date,
-		d.has_capitalization, d.is_replenishable, d.status, d.notes,
+		d.has_capitalization, d.is_replenishable, d.status, d.notes, d.closed_amount,
 		b.name, b.logo, h.name, o.name
 		FROM deposits d
 		JOIN banks b ON d.bank_id = b.id
@@ -220,7 +242,7 @@ func ExpiringDepositsForMember(db *sql.DB, days int, memberID int64) ([]Deposit,
 		if err := rows.Scan(
 			&d.ID, &d.BankID, &d.HolderID, &d.OwnerID,
 			&d.Amount, &d.InterestRate, &d.OpenDate, &d.EndDate,
-			&d.HasCapitalization, &d.IsReplenishable, &d.Status, &d.Notes,
+			&d.HasCapitalization, &d.IsReplenishable, &d.Status, &d.Notes, &d.ClosedAmount,
 			&d.BankName, &d.BankLogo, &d.HolderName, &d.OwnerName,
 		); err != nil {
 			return nil, err
@@ -243,7 +265,7 @@ func ExpiringDeposits(db *sql.DB, days int) ([]Deposit, error) {
 	deadline := time.Now().AddDate(0, 0, days).Format("2006-01-02")
 	query := `SELECT d.id, d.bank_id, d.holder_id, d.owner_id,
 		d.amount, d.interest_rate, d.open_date, d.end_date,
-		d.has_capitalization, d.is_replenishable, d.status, d.notes,
+		d.has_capitalization, d.is_replenishable, d.status, d.notes, d.closed_amount,
 		b.name, b.logo, h.name, o.name
 		FROM deposits d
 		JOIN banks b ON d.bank_id = b.id
@@ -262,7 +284,7 @@ func ExpiringDeposits(db *sql.DB, days int) ([]Deposit, error) {
 		if err := rows.Scan(
 			&d.ID, &d.BankID, &d.HolderID, &d.OwnerID,
 			&d.Amount, &d.InterestRate, &d.OpenDate, &d.EndDate,
-			&d.HasCapitalization, &d.IsReplenishable, &d.Status, &d.Notes,
+			&d.HasCapitalization, &d.IsReplenishable, &d.Status, &d.Notes, &d.ClosedAmount,
 			&d.BankName, &d.BankLogo, &d.HolderName, &d.OwnerName,
 		); err != nil {
 			return nil, err

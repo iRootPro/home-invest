@@ -44,6 +44,9 @@ func Init(fsys fs.FS) error {
 		"sub": func(a, b float64) float64 {
 			return a - b
 		},
+		"add": func(a, b float64) float64 {
+			return a + b
+		},
 		"asvColor": func(amount float64) string {
 			ratio := amount / 1400000
 			if ratio >= 1.0 {

@@ -222,7 +222,8 @@ func (h *DepositsHandler) Close(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if err := models.CloseDeposit(h.DB, id); err != nil {
+	closedAmount, _ := strconv.ParseFloat(strings.ReplaceAll(r.FormValue("closed_amount"), " ", ""), 64)
+	if err := models.CloseDeposit(h.DB, id, closedAmount); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
