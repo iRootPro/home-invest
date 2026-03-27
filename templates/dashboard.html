@@ -54,7 +54,7 @@
                     {{end}}
                 </div>
                 <div class="text-2xl font-bold tabular-nums text-gray-900 mb-2">{{formatAmount .Amount}} ₽</div>
-                <div class="text-sm text-gray-500 mb-1">{{.HolderName}}</div>
+                <div class="text-sm text-gray-500 mb-1">{{.HolderName}} / {{.OwnerName}}</div>
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-500">{{formatDate .EndDate}}</span>
                     {{if eq $days 0}}<span class="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">Сегодня</span>
