@@ -61,7 +61,7 @@ func Init(fsys fs.FS) error {
 			return items
 		},
 		"formatFloat": func(f float64) string {
-			return strconv.FormatFloat(f, 'f', -1, 64)
+			return strconv.FormatFloat(f, 'f', 2, 64)
 		},
 		"formatDateInput": func(s string) string {
 			for _, layout := range []string{"2006-01-02", time.RFC3339, "2006-01-02 15:04:05"} {
