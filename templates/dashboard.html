@@ -35,7 +35,8 @@
         <h3 class="text-sm font-semibold text-gray-900 mb-3">Истекают в ближайшие 30 дней</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {{range .Expiring}}
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow border-l-4 border-l-amber-400">
+            {{$days := daysUntil .EndDate}}
+            <div class="rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow border-l-4 {{if le $days 3}}border-l-red-500 bg-red-50{{else if le $days 7}}border-l-orange-400 bg-white{{else}}border-l-amber-400 bg-white{{end}}">
                 <div class="flex items-center gap-2 mb-2">
                     {{if .BankLogo}}
                     <img src="/uploads/{{.BankLogo}}" class="h-6 w-6 rounded object-cover" alt="">
@@ -54,7 +55,14 @@
                 </div>
                 <div class="text-2xl font-bold tabular-nums text-gray-900 mb-2">{{formatAmount .Amount}} ₽</div>
                 <div class="text-sm text-gray-500 mb-1">{{.HolderName}}</div>
-                <div class="text-sm text-gray-500">{{formatDate .EndDate}}</div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500">{{formatDate .EndDate}}</span>
+                    {{if eq $days 0}}<span class="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">Сегодня</span>
+                    {{else if eq $days 1}}<span class="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">Завтра</span>
+                    {{else if le $days 3}}<span class="text-xs font-semibold text-red-700 bg-red-100 px-1.5 py-0.5 rounded">Через {{$days}} дня</span>
+                    {{else if le $days 7}}<span class="text-xs font-semibold text-orange-700 bg-orange-100 px-1.5 py-0.5 rounded">Через {{$days}} дней</span>
+                    {{end}}
+                </div>
             </div>
             {{end}}
         </div>

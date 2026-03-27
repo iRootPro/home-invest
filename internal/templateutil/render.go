@@ -57,6 +57,18 @@ func Init(fsys fs.FS) error {
 			}
 			return "green"
 		},
+		"daysUntil": func(dateStr string) int {
+			for _, layout := range []string{"2006-01-02", time.RFC3339} {
+				if t, err := time.Parse(layout, dateStr); err == nil {
+					now := time.Now()
+					today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+					target := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+					return int(target.Sub(today).Hours() / 24)
+				}
+			}
+			return 999
+		},
+		"le": func(a, b int) bool { return a <= b },
 		"seq": func(items ...any) []any {
 			return items
 		},
