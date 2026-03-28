@@ -175,7 +175,7 @@ func GetDeposit(db *sql.DB, id int64) (*Deposit, error) {
 		WHERE d.id = ?`, id).Scan(
 		&d.ID, &d.BankID, &d.HolderID, &d.OwnerID,
 		&d.Amount, &d.InterestRate, &d.OpenDate, &d.EndDate,
-		&d.HasCapitalization, &d.IsReplenishable, &d.Status, &d.Notes,
+		&d.HasCapitalization, &d.IsReplenishable, &d.Status, &d.Notes, &d.ClosedAmount,
 		&d.BankName, &d.BankLogo, &d.HolderName, &d.OwnerName,
 	)
 	if err != nil {
